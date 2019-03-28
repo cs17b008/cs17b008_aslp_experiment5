@@ -1,75 +1,45 @@
 .data
-	q: .word 8
-	m: .word 4
-	a: .word 0
-	
-.text
-main:
-	lw $s1,m
-	lw $s2,q
-	lw $s3,a
-	addi $t1,$t1,32
-	addi $s6,$s6,1
-	sll $s7,$s6,31
-	j loop1
-	
-loop1:
-     slt $t2,$0,$t1
-     beq $t2,$0,Exit
-     and $s4,$s3,$s7
-     srl $s4,$s4,31
-     beq $s4,$0,loop3
-     beq $s4,$s6,loop2  
-loop2:
-	and $t4,$s7,$s2
-	srl $t4,$t4,31
-	addu $s3,$s3,$t4
-	sll $s2,$s2,1
-	sll $s3,$s3,1
-	addu $s3,$s3,$s1
-	j loop4
-	
-loop3:
-	and $t4,$s7,$s2
-	srl $t4,$t4,31
-	add $s3,$s3,$t4
-	sll $s2,$s2,1
-	sll $s3,$s3,1
-	subu $s3,$s3,$s1
- 	j loop4
-	
-loop4:
-	and $t5,$s7,$s3
-	srl $t5,$t5,31
-	beq $t5,$s6,loop5
-	beq $t5,$0,loop6
 
-loop5:
-	subu $t1,$t1,$s6
-	beq $t1,$0,loop7
+	q: .word 32  
+	a: .word 0
+	m: .word 5
+	n: .word 32
+.text
+
+main:
+	lw $t0,q	#divident =q / quotient
+	lw $t1,m        #divisor =m
+	lw $t2,a	#a /reminder
+	lw $t3,n	#number of bits
+	addi $s0,$s0,0   #s0=0
+	addi $s1,$s1,1   #s1=1
+	sll $t5,$s1,31
+loop1:
+	slt $s2,$0,$t3
+	beq $s2,$0,Exit
+        and $s3,$t5,$t0
+	srl $s3,$s3,31
+	sll $t2,$t2,1
+	add $t2,$t2,$s3
+	sll $t0,$t0,1
+	sub $t2,$t2,$t1
+	and $s4,$t2,$t5
+	srl $s4,$s4,31
+	beq $s4,$s0,loop2
+	beq $s4,$s1,loop3
+
+loop2:
+	add $t0,$t0,$s1
+	sub $t3,$t3,$s1
+	j loop4
+loop3:
+	add $t2,$t2,$t1
+	sub $t3,$t3,$s1
+	j loop4
+loop4:
+	beq $t3,$s0,Exit
 	j loop1
-	
-loop6:
-	addiu $s2,$s2,1
-	subu $t1,$t1,$s6
-	beq $t1,$0,loop7
-	j loop1
-	
-loop7:
-	and $t5,$s7,$s3
-	srl $t5,$t5,31	
-	beq $t5,$s6,loop8
-	beq $t5,$s8,Exit
-	
-loop8:
-       add $s3,$s3,$s1
-       j Exit
-       
-       
-       
-       
- Exit:
- 
- 	sw $s2,q
- 	sw $s3,a
- 	jr $ra
+Exit:
+	sw $t0,q
+	sw $t2,a
+	j $ra
